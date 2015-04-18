@@ -17,19 +17,21 @@ web:
     - data
 
 php:
-  build: docker/php
+  image: louisbl/php:5.6-fpm
   links:
     - db
   volumes_from:
     - data
 
 composer:
-  build: docker/composer
+  image: louisbl/composer
   volumes_from:
     - data
 
 artisan:
-  build: docker/artisan
+  image: louisbl/php:5.6-cli
+  entrypoint: ["php", "artisan"]
+  command: "artisan --help"
   links:
     - db
   volumes_from:
@@ -45,8 +47,15 @@ db:
     MYSQL_USER: database
     MYSQL_PASSWORD: database
 
+varnish:
+  image: louisbl/varnish:4.0
+  ports:
+    - "8017:80"
+  links:
+    - web:backend
+
 adminer:
-  image: louisbl/adminer:4.1.0
+  image: louisbl/adminer:4.2.1
   ports:
     - "8015:80"
   links:
